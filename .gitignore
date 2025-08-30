@@ -17,3 +17,5 @@ pnpm-lock.yaml
 
 tracking-jobs-store
 tracking-jobs-store/*
+
+*.tgz
