@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "author": "Leo Bantolino",
   "bin": {
-    "coop_assistant_cli": "./bin/run.js"
+    "coop_assistant_cli": "./bin/run.js",
+    "CoopHelp": "./bin/run.js"
   },
-  "bugs": "https://github.com/Leo Bantolino/na/issues",
+  "bugs": "https://github.com/LeoBantolino/coop_assistant_cli/issues",
   "dependencies": {
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
@@ -42,7 +43,7 @@
     "./dist",
     "./oclif.manifest.json"
   ],
-  "homepage": "https://github.com/Leo Bantolino/na",
+  "homepage": "https://github.com/LeoBantolino/coop_assistant_cli",
   "keywords": [
     "oclif"
   ],
@@ -50,8 +51,8 @@
   "main": "dist/index.js",
   "type": "module",
   "oclif": {
-    "bin": "coop_assistant_cli",
-    "dirname": "coop_assistant_cli",
+    "bin": "CoopHelp",
+    "dirname": "CoopHelp",
     "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-help",
@@ -64,7 +65,7 @@
       }
     }
   },
-  "repository": "Leo Bantolino/na",
+  "repository": "https://github.com/LeoBantolino/coop_assistant_cli",
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint",

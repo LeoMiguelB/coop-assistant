@@ -36,7 +36,7 @@ export class DocumentManager {
 
         // Instead of returning a JSX element, return the component type and props for the consumer to render.
         var dto = new JobsViewDTO(JobsView, {positions: data})
-        
+
         return dto;
     }
 

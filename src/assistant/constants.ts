@@ -1,5 +1,6 @@
 // Use the user's documents folder if available, otherwise fallback to current directory
 const getDefaultDbPath = () => {
+    const child = "CoopAssistantCli"
     const home = process.env.HOME || process.env.USERPROFILE;
     let documentsPath: string | undefined;
 
@@ -10,10 +11,10 @@ const getDefaultDbPath = () => {
     }
 
     if (documentsPath) {
-        return `${documentsPath}/tracking-jobs-store`;
+        return `${documentsPath}/${child}`;
     }
     // fallback to current directory
-    return "./tracking-jobs-store";
+    return `./${child}`;
 };
 
 export const DB_PATH = getDefaultDbPath();
