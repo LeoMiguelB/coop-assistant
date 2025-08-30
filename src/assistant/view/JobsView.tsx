@@ -37,20 +37,20 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
                         paddingX={1}
                         marginBottom={1}
                     >
-                        <Text color="cyan" bold>
+                        <Text key={company.company + idx + "inner header"} color="cyan" bold>
                             Company: <Text color="white" bold>{company.company}</Text>
                         </Text>
-                        <Box flexDirection="column" marginLeft={2}>
-                            <Text color="green" bold>
+                        <Box key={company.company + idx + "inner box"} flexDirection="column" marginLeft={2}>
+                            <Text color="green" key={company.company + idx + "inner positions header"} bold>
                                 Positions:
                             </Text>
                             {company.positions.length === 0 ? (
                                 <Box marginLeft={2}>
-                                    <Text color="gray">No positions</Text>
+                                    <Text key={company.company + "empty"} color="gray">No positions</Text>
                                 </Box>
                             ) : (
                                 company.positions.map((p, posIdx) => (
-                                    <Box key={p.name + posIdx} marginLeft={2} flexDirection="column">
+                                    <Box key={company.company + p.name + posIdx} marginLeft={2} flexDirection="column">
                                         <Box>
                                             <Text color="yellow">- </Text>
                                             <Text>
