@@ -11,15 +11,19 @@
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
     "@oclif/plugin-plugins": "^5",
-    "level": "^10.0.0"
+    "ink": "^6.2.3",
+    "level": "^10.0.0",
+    "react": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
     "@types/chai": "^4",
+    "@types/ink": "^2.0.3",
     "@types/mocha": "^10",
     "@types/node": "^18",
+    "@types/react": "^19.1.12",
     "chai": "^4",
     "eslint": "^9",
     "eslint-config-oclif": "^6",

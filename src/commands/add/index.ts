@@ -1,40 +1,51 @@
-import {Args, Command, Flags} from '@oclif/core'
-import { Level } from 'level';
-import { ICompany } from '../../assistant/models/Company.js';
-import { DB_PATH } from '../../assistant/constants.js';
-import { DocumentManager } from '../../assistant/DocumentManager.js';
-import { Position } from '../../assistant/models/Position.js';
+import {Command, Flags} from '@oclif/core'
+import {Level} from 'level'
+import {ICompany} from '../../assistant/models/Company.js'
+import {DB_PATH} from '../../assistant/constants.js'
+import {DocumentManager} from '../../assistant/DocumentManager.js'
+import {IPosition, Position} from '../../assistant/models/Position.js'
 
 export default class Add extends Command {
     static description = 'Add a job to track.'
-    static examples = [
-      `path/to/cmd add -c "Company Name" -j "Job Name" -u "https://www.google.com"`,
-    ]
+    static examples = [`path/to/cmd add -c "Company Name" -j "Job Name" -u "https://www.google.com"`]
     static flags = {
-      company: Flags.string({char: 'c', description: 'Company name', required: true}),
-      jobName: Flags.string({char: 'j', description: 'Job name', required: true}),
-      jobUrl: Flags.string({char: 'u', description: 'Job URL', required: true}),
+        company: Flags.string({char: 'c', description: 'Company name', required: true}),
+        jobName: Flags.string({char: 'j', description: 'Job name', required: true}),
+        jobUrl: Flags.string({char: 'u', description: 'Job URL', required: true}),
+        tier: Flags.string({char: 't', description: 'Position tier', required: false, default: 'B'}),
     }
 
     async run(): Promise<any> {
-        const { flags } = await this.parse(Add)
+        const {flags} = await this.parse(Add)
 
-        const db = new Level<string, ICompany>(DB_PATH, { valueEncoding: 'json' });
+        const db = new Level<string, ICompany>(DB_PATH, {valueEncoding: 'json'})
 
-        const documentManager = new DocumentManager(db);
+        const documentManager = new DocumentManager(db)
 
+        const isValidTier = (tier: string): tier is IPosition['tier'] => {
+            return ['S', 'A', 'B'].includes(tier as IPosition['tier']);
+        };
+
+        let tier: IPosition['tier'];
+        if (isValidTier(flags.tier)) {
+            tier = flags.tier;
+        } else {
+            this.error('Invalid tier provided. Must be one of S, A, B.');
+        }
+
+        // TODO: have integrated AI fill missing info (ex, only url is passed)
         const position = new Position(
             flags.company,
             flags.jobName,
             flags.jobUrl,
             'active',
-            'mid size',
+            tier,
             Date.now().toString(),
-            Date.now().toString()
-        );
+            Date.now().toString(),
+        )
 
-        documentManager.AddPosition(flags.company, position);
+        var msg = await documentManager.AddPosition(flags.company, position)
 
-        this.log(`Successfully added ${flags.jobUrl}`);
+        this.log(msg);
     }
 }

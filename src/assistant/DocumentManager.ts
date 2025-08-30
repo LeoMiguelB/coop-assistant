@@ -1,58 +1,88 @@
-import { Company, ICompany } from "./models/Company.js";
-import { IPosition, Position } from "./models/Position.js";
-import { access, writeFile } from 'node:fs/promises';
-import { constants } from 'node:fs';
-import * as fs from 'fs';
-import { Level } from "level";
-import { error } from "node:console";
+import {Company, ICompany} from './models/Company.js'
+import {IPosition, IStatusValues} from './models/Position.js'
+import {Level, ValueIterator} from 'level'
+import {error} from 'node:console'
+import { JobsView, JobsViewProps } from './view/JobsView.js'
+import { JobsViewDTO } from './DTOs/JobsVIewDTO.js'
 
 export class DocumentManager {
-    private dbConn: Level<string, ICompany>;
+    private dbConn: Level<string, ICompany>
 
     constructor(dbConn: Level<string, ICompany>) {
-        this.dbConn = dbConn;
+        this.dbConn = dbConn
     }
 
-    public async AddPosition(company: string, position: IPosition) {
-        const companyDetails = await this.GetCompanyDetails(company);
+    public async AddPosition(company: string, position: IPosition): Promise<string> {
+        const companyDetails = await this.GetCompanyDetails(company)
 
         if (companyDetails == null) {
-            throw error("something went wrong trying retrieve company details.");
+            throw error('something went wrong trying retrieve company details.')
         }
 
-        companyDetails?.AddPosition(position);
+        companyDetails?.AddPosition(position)
 
-        var result = await this.UpdateCompanyDetails(companyDetails!);
+        var result = await this.UpdateCompanyDetails(companyDetails!)
 
         if (!result) {
-            throw error("something went wrong trying update company details.");
+            throw error('something went wrong trying update company details.')
         }
+
+        return `Successfully added Position: ${position.name} under ${companyDetails.company}`;
+    }
+
+    public async ViewAllPosition(): Promise<JobsViewDTO> {
+        // TODO: redo mechanism to not load everything in memory to build view output
+        const data = this.dbConn.values();
+
+        // Instead of returning a JSX element, return the component type and props for the consumer to render.
+        var dto = new JobsViewDTO(JobsView, {positions: data})
+        
+        return dto;
+    }
+
+    public async UpdatePosition(company: string, position: string, status: IStatusValues): Promise<string> {
+        const data = await this.dbConn.get(company);
+
+        let found = false;
+
+        // search/update position in company
+        for (const position of data.positions) {
+            if (position.company == company) {
+                position.status = status;
+                position.lastUpdated = Date.now().toString();
+                found = true;
+                break;
+            }
+        }
+
+        await this.dbConn.put(company, data);
+
+        return found ? `Successfully updated ${company}:${position} status to ${status}` : `Was not able to find ${company}:${position}`;
     }
 
     private async GetCompanyDetails(company: string): Promise<ICompany | null> {
         try {
-            const data: ICompany = await this.dbConn.get(company);
+            const data: ICompany = await this.dbConn.get(company)
 
             if (data == undefined) {
                 // means we don't yet have a record of company so let's return an empty one with specified name
-                return new Company(company);
+                return new Company(company)
             }
 
-            return data;
+            return data
         } catch (error) {
-            console.error(`Error encountered while reading from document db: ${error}`);
-            return null;
+            console.error(`Error encountered while reading from document db: ${error}`)
+            return null
         }
     }
 
     private async UpdateCompanyDetails(companyDetails: ICompany): Promise<boolean> {
         try {
-            await this.dbConn.put(companyDetails.company, companyDetails);
-            return true;
+            await this.dbConn.put(companyDetails.company, companyDetails)
+            return true
         } catch (error) {
-            console.error(`Encountered a problem while trying update job: ${error}`);
-            return false;
+            console.error(`Encountered a problem while trying update job: ${error}`)
+            return false
         }
     }
-      
 }
