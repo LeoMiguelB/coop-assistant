@@ -1,6 +1,7 @@
 export type IStatusValues = 'active' | 'filled' | 'rejected' | 'accepted';
 
 export interface IPosition {
+    id: string | null;
     company: string;
     name: string;
     url: string;
@@ -11,6 +12,7 @@ export interface IPosition {
 }
 
 export class Position implements IPosition {
+    private _id: string | null;
     company: string;
     name: string;
     url: string;
@@ -29,8 +31,10 @@ export class Position implements IPosition {
         // B tier positions to me are could be positions for backup
         tier: 'S' | 'A' | 'B',
         lastChecked: string,
-        lastUpdated: string
+        lastUpdated: string,
+        id = null
     ) {
+        this._id = id;
         this.company = company;
         this.name = name;
         this.url = url;
@@ -38,6 +42,14 @@ export class Position implements IPosition {
         this.tier = tier;
         this.lastChecked = lastChecked;
         this.lastUpdated = lastUpdated;
+    }
+
+    public get id(): string | null {
+        return this._id;
+    }
+    
+    public set id(value: string | null) {
+        this._id = value;
     }
 }
 

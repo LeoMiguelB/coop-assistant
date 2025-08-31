@@ -10,7 +10,7 @@ export default class Add extends Command {
     static examples = [`path/to/cmd add -c "Company Name" -j "Job Name" -u "https://www.google.com"`]
     static flags = {
         company: Flags.string({char: 'c', description: 'Company name', required: true}),
-        jobName: Flags.string({char: 'j', description: 'Job name', required: true}),
+        position: Flags.string({char: 'p', description: 'Job name', required: true}),
         jobUrl: Flags.string({char: 'u', description: 'Job URL', required: true}),
         tier: Flags.string({char: 't', description: 'Position tier', required: false, default: 'B'}),
     }
@@ -36,7 +36,7 @@ export default class Add extends Command {
         // TODO: have integrated AI fill missing info (ex, only url is passed)
         const position = new Position(
             flags.company,
-            flags.jobName,
+            flags.position,
             flags.jobUrl,
             'active',
             tier,
