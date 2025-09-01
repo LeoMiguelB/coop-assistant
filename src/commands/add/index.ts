@@ -4,6 +4,7 @@ import {ICompany} from '../../assistant/models/Company.js'
 import {DB_PATH} from '../../assistant/constants.js'
 import {DocumentManager} from '../../assistant/DocumentManager.js'
 import {IPosition, Position} from '../../assistant/models/Position.js'
+import {v4 as uuidv4} from 'uuid'
 
 export default class Add extends Command {
     static description = 'Add a job to track.'
@@ -43,6 +44,8 @@ export default class Add extends Command {
             Date.now().toString(),
             Date.now().toString(),
         )
+
+        position.id = uuidv4();
 
         var msg = await documentManager.AddPosition(flags.company, position)
 

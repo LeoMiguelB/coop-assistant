@@ -4,6 +4,7 @@ import {Level, ValueIterator} from 'level'
 import {error} from 'node:console'
 import { JobsView, JobsViewProps } from './view/JobsView.js'
 import { JobsViewDTO } from './DTOs/JobsVIewDTO.js'
+import {v4 as uuidv4} from 'uuid'
 
 export class DocumentManager {
     private dbConn: Level<string, ICompany>
@@ -66,7 +67,11 @@ export class DocumentManager {
 
             if (data == undefined) {
                 // means we don't yet have a record of company so let's return an empty one with specified name
-                return new Company(company)
+                const comp = new Company(company);
+                comp.id = uuidv4()
+
+                return comp;
+
             }
 
             return data

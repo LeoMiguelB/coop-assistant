@@ -1,10 +1,10 @@
-import {Command, Flags} from '@oclif/core'
-import {Level} from 'level'
-import {ICompany} from '../../assistant/models/Company.js'
-import {DB_PATH} from '../../assistant/constants.js'
-import {DocumentManager} from '../../assistant/DocumentManager.js'
-import {Position} from '../../assistant/models/Position.js'
+import { Command } from '@oclif/core'
 import { render } from 'ink'
+import { Level } from 'level'
+import React from 'react'
+import { DB_PATH } from '../../assistant/constants.js'
+import { DocumentManager } from '../../assistant/DocumentManager.js'
+import { ICompany } from '../../assistant/models/Company.js'
 
 export default class ViewJobs extends Command {
     static description = 'View List of Jobs Currently Tracking'
@@ -23,6 +23,19 @@ export default class ViewJobs extends Command {
 
         const dto = await documentManager.ViewAllPosition();
         
-        render(<dto.Component {...dto.Props} />)
+        const instance = render(React.createElement(dto.Component, dto.Props), {
+            stdout: process.stdout,
+            stdin: process.stdin,
+            stderr: process.stderr,
+            exitOnCtrlC: true,
+            patchConsole: true,
+            isScreenReaderEnabled: false,
+            debug: false,
+        });
+
+        await instance.waitUntilExit();
+        instance.unmount();
+        instance.clear();
+        instance.cleanup();
     }
 }

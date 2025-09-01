@@ -1,9 +1,7 @@
-import {Level, ValueIterator} from 'level'
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import {ICompany} from '../models/Company.js'
 import {IPosition} from '../models/Position.js'
 import {Box, Text} from 'ink'
-import {v4 as uuidv4} from 'uuid'
 
 export interface JobsViewProps {
     positions: AsyncIterable<ICompany>
@@ -15,19 +13,12 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
     const [companies, setCompanies] = React.useState<ICompany[]>([])
 
     useEffect(() => {
-        let cancelled = false
+        let cancelled = false;
         // call asynchronously and update state as we go
         // this helps to not load everything early one, and only till now
-        ;(async () => {
+        (async () => {
             for await (const company of positions) {
                 if (cancelled) break
-
-                // generate id's for managing renders
-                company.id = uuidv4()
-
-                for (const p of company.positions) {
-                    p.id = uuidv4()
-                }
 
                 setCompanies(prev => [...prev, company])
             }
@@ -39,7 +30,7 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
 
     return (
         <Box flexDirection='column'>
-            {companies.map((company, idx) => (
+            {companies.map((company) => (
                 <Box
                     key={company.id}
                     flexDirection='column'
@@ -63,8 +54,8 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
                                 <Text color='gray'>No positions</Text>
                             </Box>
                         ) : (
-                            company.positions.map((p, posIdx) => (
-                                <Box key={p.id} marginLeft={2} flexDirection='column'>
+                            company.positions.map((p) => (
+                                <Box key={company.id! + p.id!} marginLeft={2} flexDirection='column'>
                                     <Box>
                                         <Text color='yellow'>- </Text>
                                         <Text>
@@ -89,8 +80,8 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
                                             <Text color='gray'>{p.url}</Text>
                                         </Box>
                                         <Box>
-                                            <Text color='green'>Last Checked: </Text>
-                                            <Text color='gray'>{formatDate(p.lastChecked)}</Text>
+                                            <Text color='green'>Created Date: </Text>
+                                            <Text color='gray'>{formatDate(p.createdDate)}</Text>
                                         </Box>
                                         <Box>
                                             <Text color='yellow'>Last Updated: </Text>

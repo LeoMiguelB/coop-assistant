@@ -7,7 +7,7 @@ export interface IPosition {
     url: string;
     status: IStatusValues;
     tier: 'S' | 'A' | 'B';
-    lastChecked: string;
+    createdDate: string;
     lastUpdated: string;
 }
 
@@ -18,7 +18,7 @@ export class Position implements IPosition {
     url: string;
     status: IStatusValues;
     tier: 'S' | 'A' | 'B';
-    lastChecked: string;
+    createdDate: string;
     lastUpdated: string;
 
     constructor(
@@ -30,7 +30,7 @@ export class Position implements IPosition {
         // A tier positions are one off positions are big/small companies such as QA but at apple
         // B tier positions to me are could be positions for backup
         tier: 'S' | 'A' | 'B',
-        lastChecked: string,
+        createdDate: string,
         lastUpdated: string,
         id = null
     ) {
@@ -40,7 +40,7 @@ export class Position implements IPosition {
         this.url = url;
         this.status = status;
         this.tier = tier;
-        this.lastChecked = lastChecked;
+        this.createdDate = createdDate;
         this.lastUpdated = lastUpdated;
     }
 
