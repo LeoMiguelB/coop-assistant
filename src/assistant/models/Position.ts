@@ -1,4 +1,5 @@
 export type IStatusValues = 'active' | 'filled' | 'rejected' | 'accepted';
+import {v4 as uuidv4} from 'uuid'
 
 export interface IPosition {
     id: string | null;
@@ -12,7 +13,7 @@ export interface IPosition {
 }
 
 export class Position implements IPosition {
-    private _id: string | null;
+    id: string | null;
     company: string;
     name: string;
     url: string;
@@ -32,9 +33,9 @@ export class Position implements IPosition {
         tier: 'S' | 'A' | 'B',
         createdDate: string,
         lastUpdated: string,
-        id = null
+        id = uuidv4()
     ) {
-        this._id = id;
+        this.id = id;
         this.company = company;
         this.name = name;
         this.url = url;
@@ -42,14 +43,6 @@ export class Position implements IPosition {
         this.tier = tier;
         this.createdDate = createdDate;
         this.lastUpdated = lastUpdated;
-    }
-
-    public get id(): string | null {
-        return this._id;
-    }
-    
-    public set id(value: string | null) {
-        this._id = value;
     }
 }
 

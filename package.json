@@ -12,6 +12,7 @@
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
     "@oclif/plugin-plugins": "^5",
+    "dotenv": "^17.2.2",
     "ink": "^6.2.3",
     "level": "^10.0.0",
     "react": "^19.1.1",

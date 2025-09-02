@@ -19,3 +19,5 @@ tracking-jobs-store
 tracking-jobs-store/*
 
 *.tgz
+
+*.env
