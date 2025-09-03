@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
 import { IExtService } from "./IExtService.js";
-import dotenv from "dotenv";
 
 export class CoverLetterGenService implements IExtService {
     private readonly cvProcessPath: string;
@@ -17,7 +16,8 @@ export class CoverLetterGenService implements IExtService {
         city: string, 
         prov: string, 
         country: string, 
-        positionTitle: string) 
+        positionTitle: string,
+        cvProcessPath: string) 
     {
         this.companyName = companyName;
         this.companyAddress = companyAddress;
@@ -25,41 +25,42 @@ export class CoverLetterGenService implements IExtService {
         this.prov = prov;
         this.country = country;
         this.positionTitle = positionTitle;
-        
-        dotenv.config();
-        const path = process.env.CV_SERVICE_PATH;
-        if (!path) {
-            throw new Error("CV_SERVICE_PATH is not defined in environment variables.");
-        }
-        this.cvProcessPath = path;
+        this.cvProcessPath = cvProcessPath;
     }
 
     async Run(): Promise<void> {
         // await process
         await new Promise<void>((resolve, reject) => {
-            const process = spawn(this.cvProcessPath, [
-                '-c', this.companyName, 
-                '-a', this.companyAddress,
-                '-cy', this.city,
-                '-p', this.prov,
-                '-cn', this.country,
-                '-pt', this.positionTitle
-            ]);
+            try {
+                const cv_process = spawn('powershell', [
+                    '-File', this.cvProcessPath,
+                    '-c', this.companyName, 
+                    '-a', this.companyAddress,
+                    '-cy', this.city,
+                    '-p', this.prov,
+                    '-cn', this.country,
+                    '-pt', this.positionTitle
+                ]);
 
-            process.on('close', (code) => {
-                console.log(`Process exited with code: ${code}`);
-                if (code === 0) {
-                    console.log('CV gen success.');
-                    resolve();
-                } else {
-                    reject(new Error(`CV gen failed with exit code: ${code}`));
-                }
-            });
+                cv_process.on('close', (code) => {
+                    console.log(`Process exited with code: ${code}`);
+                    if (code === 0) {
+                        console.log('CV gen success.');
+                        resolve();
+                    } else {
+                        reject(new Error(`CV gen failed with exit code: ${code}`));
+                    }
+                });
+    
+                cv_process.on('error', (error) => {
+                    console.error(`Failed to start process: ${error.message}`);
+                    reject(error);
+                });
+            } catch (error) {
+                console.log(`Could not spawn ${this.cvProcessPath}`);
+                console.log(error);
+            }
 
-            process.on('error', (error) => {
-                console.error(`Failed to start process: ${error.message}`);
-                reject(error);
-            });
         });
     }
 }

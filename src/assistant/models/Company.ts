@@ -13,7 +13,7 @@ export class Company implements ICompany {
     company: string;
     positions: IPosition[];
     
-    constructor(company: string = "", positions: IPosition[] = [], id = null) {
+    constructor(company: string = "", positions: IPosition[] = [], id: string | null = null) {
         this.id = id;
         this.company = company;
         this.positions = positions;

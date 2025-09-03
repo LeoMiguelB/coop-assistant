@@ -1,5 +1,5 @@
 import {Company, ICompany} from './models/Company.js'
-import {IPosition, IStatusValues} from './models/Position.js'
+import {IPosition, IStatusValues, Position} from './models/Position.js'
 import {Level, ValueIterator} from 'level'
 import {error} from 'node:console'
 import { JobsView, JobsViewProps } from './view/JobsView.js'
@@ -17,7 +17,13 @@ export class DocumentManager {
         const companyDetails = await this.GetCompanyDetails(company)
 
         if (companyDetails == null) {
-            throw error('something went wrong trying retrieve company details.')
+            return 'something went wrong trying retrieve company details.';
+        }
+
+        // TODO: implement equality in Position implementation to better compare
+        // TODO: best to provide implementation on returns to indicate consumer whether to run other services rather than just return a string
+        if (companyDetails.positions && companyDetails.positions.some(pos => pos.name === position.name)) {
+            return `Position: ${position.name} already exists under ${companyDetails.company}.`;
         }
 
         companyDetails?.AddPosition(position)
@@ -25,7 +31,7 @@ export class DocumentManager {
         var result = await this.UpdateCompanyDetails(companyDetails!)
 
         if (!result) {
-            throw error('something went wrong trying update company details.')
+            return 'something went wrong trying update company details.';
         }
 
         return `Successfully added Position: ${position.name} under ${companyDetails.company}`;
@@ -61,6 +67,18 @@ export class DocumentManager {
         return found ? `Successfully updated ${company}:${position} status to ${status}` : `Was not able to find ${company}:${position}`;
     }
 
+    public async DeleteCompany(company: string): Promise<string> {
+        try {
+            await this.dbConn.del(company);
+        } catch (error) {
+            return `Failed to deleted ${company}, received: ${error}`;
+        }
+
+        return `Successfully deleted all entries related to ${company}`;
+    }
+
+    // TODO: make a delete position
+
     private async GetCompanyDetails(company: string): Promise<ICompany | null> {
         try {
             const data: ICompany = await this.dbConn.get(company)
@@ -74,7 +92,7 @@ export class DocumentManager {
 
             }
 
-            return data
+            return data;
         } catch (error) {
             console.error(`Error encountered while reading from document db: ${error}`)
             return null

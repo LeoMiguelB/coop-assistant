@@ -17,7 +17,6 @@ export default class Add extends Command {
         city: Flags.string({char: 'm', aliases: ['cy'], description: 'City of Company', required: true}),
         province: Flags.string({char: 'o', aliases: ['pv'], description: 'Province of Company', required: true}),
         country: Flags.string({char: 'q', aliases: ['ct'], description: 'Country of Company', required: true}),
-        postal: Flags.string({char: 'z', aliases: ['pl'], description: 'Postal Code of Company', required: true}),
         tier: Flags.string({char: 't', description: 'Position tier', required: false, default: 'B'}),
     }
 
@@ -61,7 +60,9 @@ export default class Add extends Command {
             flags.city,
             flags.province,
             flags.country,
-            flags.position
+            flags.position,
+            // Really oughta put this in a .env
+            "D:\\SCHOOL\\COOP_SEACH_W26\\COVER LETTER AUTOMATED\\generate_cover_letter.ps1"
         );
 
         await cvGenService.Run();
