@@ -1,60 +1,40 @@
-import React, { useEffect } from 'react'
+import React, {useEffect, useState} from 'react'
 import {ICompany} from '../models/Company.js'
 import {IPosition} from '../models/Position.js'
 import {Box, Text} from 'ink'
+import {PaginatedList} from './components/Pager.js'
+import {PaginationInstructions} from './PaginationInstructions.js'
 
-export interface JobsViewProps {
-    positions: AsyncIterable<ICompany>
+export interface PositionsViewProps {
+    company: ICompany
 }
 
-export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
-    const {positions} = props
-
-    const [companies, setCompanies] = React.useState<ICompany[]>([])
-
-    useEffect(() => {
-        let cancelled = false;
-        // call asynchronously and update state as we go
-        // this helps to not load everything early one, and only till now
-        (async () => {
-            for await (const company of positions) {
-                if (cancelled) break
-
-                setCompanies(prev => [...prev, company])
-            }
-        })()
-        return () => {
-            cancelled = true
-        }
-    }, [positions])
+export const PositionsView: React.FC<PositionsViewProps> = (props: PositionsViewProps) => {
+    const {company} = props
 
     return (
         <Box flexDirection='column'>
-            {companies.map((company) => (
-                <Box
-                    key={company.id}
-                    flexDirection='column'
-                    borderStyle='round'
-                    borderColor='cyan'
-                    paddingX={1}
-                    marginBottom={1}
-                >
-                    <Text color='cyan' bold>
-                        Company:{' '}
-                        <Text color='white' bold>
-                            {company.company}
-                        </Text>
+            <PaginationInstructions />
+
+            <Box flexDirection='row' alignItems='flex-start' justifyContent='flex-start' marginBottom={1} paddingX={2}>
+                <Text>
+                    <Text color='cyanBright' bold>
+                        Total Positions Applied Under {company.company}:
+                    </Text>{' '}
+                    <Text color='white' bold>
+                        {company.positions.length}
                     </Text>
-                    <Box flexDirection='column' marginLeft={2}>
-                        <Text color='green' bold>
-                            Positions:
-                        </Text>
-                        {company.positions.length === 0 ? (
-                            <Box marginLeft={2}>
-                                <Text color='gray'>No positions</Text>
-                            </Box>
-                        ) : (
-                            company.positions.map((p) => (
+                </Text>
+            </Box>
+            {company.positions.length === 0 ? (
+                <Box marginLeft={2}>
+                    <Text color='gray'>No positions</Text>
+                </Box>
+            ) : (
+                <PaginatedList list={company.positions} pageSize={1} isCursorOn={true}>
+                    {({data}) => (
+                        <>
+                            {data.map(p => (
                                 <Box key={company.id! + p.id!} marginLeft={2} flexDirection='column'>
                                     <Box>
                                         <Text color='yellow'>- </Text>
@@ -89,11 +69,11 @@ export const JobsView: React.FC<JobsViewProps> = (props: JobsViewProps) => {
                                         </Box>
                                     </Box>
                                 </Box>
-                            ))
-                        )}
-                    </Box>
-                </Box>
-            ))}
+                            ))}
+                        </>
+                    )}
+                </PaginatedList>
+            )}
         </Box>
     )
 }

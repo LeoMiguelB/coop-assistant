@@ -2,9 +2,11 @@ import {Company, ICompany} from './models/Company.js'
 import {IPosition, IStatusValues, Position} from './models/Position.js'
 import {Level, ValueIterator} from 'level'
 import {error} from 'node:console'
-import { JobsView, JobsViewProps } from './view/JobsView.js'
-import { JobsViewDTO } from './DTOs/JobsVIewDTO.js'
+import { CompaniesView, CompaniesViewProps } from './view/CompaniesView.js'
+import { CompaniesViewDTO } from './DTOs/CompaniesViewDTO.js'
 import {v4 as uuidv4} from 'uuid'
+import { PositionsViewDTO } from './DTOs/PositionsViewDTO.js'
+import { PositionsView } from './view/PositionsView.js'
 
 export class DocumentManager {
     private dbConn: Level<string, ICompany>
@@ -37,12 +39,25 @@ export class DocumentManager {
         return `Successfully added Position: ${position.name} under ${companyDetails.company}`;
     }
 
-    public async ViewAllPosition(): Promise<JobsViewDTO> {
-        // TODO: redo mechanism to not load everything in memory to build view output
+    public async ViewCompanies(): Promise<CompaniesViewDTO> {
         const data = this.dbConn.values();
 
         // Instead of returning a JSX element, return the component type and props for the consumer to render.
-        var dto = new JobsViewDTO(JobsView, {positions: data})
+        var dto = new CompaniesViewDTO(CompaniesView, {positions: data})
+
+        return dto;
+    }
+
+    public async ViewPositions(company: string): Promise<PositionsViewDTO | null> {
+        
+        const data = await this.dbConn.get(company);
+
+        if (data == undefined) {
+            return null;
+        }
+
+        // Instead of returning a JSX element, return the component type and props for the consumer to render.
+        var dto = new PositionsViewDTO(PositionsView, {company: data})
 
         return dto;
     }
@@ -92,20 +107,30 @@ export class DocumentManager {
 
             }
 
-            return data;
+            // Clean the data by creating new instances with only the expected properties
+            // This ensures we have proper class instances with methods
+            const cleanCompany = new Company(
+                data.company, 
+                data.positions.map(p => new Position(
+                    p.company, p.name, p.url, p.status, p.tier, p.createdDate, p.lastUpdated, p.id || undefined
+                )), 
+                data.id
+            );
+
+            return cleanCompany;
         } catch (error) {
             console.error(`Error encountered while reading from document db: ${error}`)
-            return null
+            return null;
         }
     }
 
     private async UpdateCompanyDetails(companyDetails: ICompany): Promise<boolean> {
         try {
             await this.dbConn.put(companyDetails.company, companyDetails)
-            return true
+            return true;
         } catch (error) {
             console.error(`Encountered a problem while trying update job: ${error}`)
-            return false
+            return false;
         }
     }
 }
